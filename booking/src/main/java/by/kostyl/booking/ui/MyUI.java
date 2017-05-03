@@ -80,15 +80,18 @@ public class MyUI extends UI {
 	public void updateHotels(String t) {
 		hotelGrid.setItems(hotelService.findAll(t));
 	}
+	public void filterHotels(String searchString,int type){
+		hotelGrid.setItems(hotelService.filter(searchString,type));
+	}
 
 	private CssLayout buildFilteringLayout() {
 		filterByAddressField.setPlaceholder("Enter address u want to see...");
-		filterByAddressField.addValueChangeListener(e -> updateHotels(e.getValue()));
+		filterByAddressField.addValueChangeListener(e -> filterHotels(e.getValue(),1));
 		clearAddressFilterBtn.addClickListener(e -> filterByAddressField.clear());
 		CssLayout lay1 = new CssLayout(filterByAddressField, clearAddressFilterBtn);
 		lay1.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		filterField.setPlaceholder("Enter ur searchstring...");
-		filterField.addValueChangeListener(e -> updateHotels(e.getValue()));
+		filterField.addValueChangeListener(e -> filterHotels(e.getValue(),0));
 		clearBtn.addClickListener(e -> filterField.clear());
 		CssLayout lay2 = new CssLayout(filterField, clearBtn);
 		lay2.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
