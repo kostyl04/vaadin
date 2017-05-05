@@ -1,9 +1,11 @@
 package by.kostyl.booking.ui;
 
 import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServletRequest;
 
 import com.vaadin.annotations.Theme;
 import com.vaadin.annotations.VaadinServletConfiguration;
+import com.vaadin.annotations.Widgetset;
 import com.vaadin.icons.VaadinIcons;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinRequest;
@@ -33,6 +35,7 @@ import by.kostyl.booking.service.HotelService;
  * intended to be overridden to add component to the user interface and
  * initialize non-component functionality.
  */
+
 @Theme("mytheme")
 public class MyUI extends UI {
 	private HotelService hotelService = HotelService.getInstance();
@@ -80,18 +83,19 @@ public class MyUI extends UI {
 	public void updateHotels(String t) {
 		hotelGrid.setItems(hotelService.findAll(t));
 	}
-	public void filterHotels(String searchString,int type){
-		hotelGrid.setItems(hotelService.filter(searchString,type));
+
+	public void filterHotels(String searchString, int type) {
+		hotelGrid.setItems(hotelService.filter(searchString, type));
 	}
 
 	private CssLayout buildFilteringLayout() {
 		filterByAddressField.setPlaceholder("Enter address u want to see...");
-		filterByAddressField.addValueChangeListener(e -> filterHotels(e.getValue(),1));
+		filterByAddressField.addValueChangeListener(e -> filterHotels(e.getValue(), 1));
 		clearAddressFilterBtn.addClickListener(e -> filterByAddressField.clear());
 		CssLayout lay1 = new CssLayout(filterByAddressField, clearAddressFilterBtn);
 		lay1.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
 		filterField.setPlaceholder("Enter ur searchstring...");
-		filterField.addValueChangeListener(e -> filterHotels(e.getValue(),0));
+		filterField.addValueChangeListener(e -> filterHotels(e.getValue(), 0));
 		clearBtn.addClickListener(e -> filterField.clear());
 		CssLayout lay2 = new CssLayout(filterField, clearBtn);
 		lay2.setStyleName(ValoTheme.LAYOUT_COMPONENT_GROUP);
@@ -100,8 +104,9 @@ public class MyUI extends UI {
 		return lay;
 	}
 
-	@WebServlet(urlPatterns = "/*", name = "MyUIServlet", asyncSupported = true)
-	@VaadinServletConfiguration(ui = MyUI.class, productionMode = false)
+	@WebServlet(urlPatterns = "/*", asyncSupported = true)
+	@VaadinServletConfiguration(ui = MyUI.class, productionMode = false, widgetset = "")
 	public static class MyUIServlet extends VaadinServlet {
+
 	}
 }
