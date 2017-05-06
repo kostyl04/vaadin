@@ -1,5 +1,9 @@
-F:\projects\booking\src\main\java\by\kostyl\booking\entity\Hotel.java
-F:\projects\booking\src\main\java\by\kostyl\booking\service\HotelService.java
-F:\projects\booking\src\main\java\by\kostyl\booking\entity\HotelCategory.java
-F:\projects\booking\src\main\java\by\kostyl\booking\ui\HotelForm.java
-F:\projects\booking\src\main\java\by\kostyl\booking\ui\MyUI.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\ui\HotelCategoryView.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\service\HotelService.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\ui\App.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\entity\HotelCategory.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\ui\Header.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\converters\OperatesFromConverter.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\entity\Hotel.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\ui\HotelForm.java
+D:\vaadin-master\booking\src\main\java\by\kostyl\booking\ui\HotelView.java

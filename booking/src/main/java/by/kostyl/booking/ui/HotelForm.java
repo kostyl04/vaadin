@@ -12,6 +12,7 @@ import com.vaadin.ui.DateField;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.declarative.Design;
@@ -31,7 +32,7 @@ import by.kostyl.booking.service.HotelService;
  */
 
 public class HotelForm extends FormLayout {
-	private MyUI ui;
+	private HotelView ui;
 	private Hotel hotel;
 	private HotelService hotelService = HotelService.getInstance();
 	private TextField name = new TextField("name");
@@ -49,7 +50,7 @@ public class HotelForm extends FormLayout {
 	private Button deleteBtn = new Button("Delete");
 	private Binder<Hotel> hotelBinder = new Binder(Hotel.class);
 
-	public HotelForm(MyUI ui) {
+	public HotelForm(HotelView ui) {
 		this.ui = ui;
 		setSizeUndefined();
 		HorizontalLayout buttons = new HorizontalLayout(saveBtn, deleteBtn);
@@ -86,7 +87,7 @@ public class HotelForm extends FormLayout {
 		.withValidator(val ->  val > 0, "Were u operating for negative days??")
 		.bind(Hotel::getOperatesFrom,
 				Hotel::setOperatesFrom);
-		
+		//hotelBinder.forField(category).asRequired("select category!");
 		//tooltips for fields
 		rating.setDescription("Enter rating from 1 to 5");
 		name.setDescription("Enter name of ur hotel");
@@ -114,10 +115,15 @@ public class HotelForm extends FormLayout {
 	}
 
 	public void saveHotel() {
-		hotelService.save(hotel);
-		this.ui.updateHotels("");
-		setVisible(false);
+		if(hotelBinder.isValid()){
+			hotelService.save(hotel);
+			this.ui.updateHotels("");
+			setVisible(false);
+		}else
+		Notification.show("Please take a look to fields tooltips and fill all fields correctly!!");
 
 	}
+
+	
 
 }
