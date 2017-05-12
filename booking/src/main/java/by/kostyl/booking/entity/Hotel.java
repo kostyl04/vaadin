@@ -3,57 +3,46 @@ package by.kostyl.booking.entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-@SuppressWarnings("serial")
-public class Hotel implements Serializable, Cloneable {
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Version;
+import javax.validation.constraints.NotNull;
 
-	private Long id;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
-	private String name = "";
+@Entity
+public class Hotel extends AbstractEntity {
 
-	private String address = "";
-
-	private int rating;
-
+	@Column
+	@NotNull
+	private String name;
+	@Column
+	@NotNull
+	private String address;
+	@Version
+	@Column(name = "OPTLOCK", columnDefinition = "BIGINT default '0'")
+	private Long optlock;
+	@Column
+	@NotNull
+	private Integer rating;
+	@Column(name = "OPERATES_FROM")
+	@NotNull
 	private Long operatesFrom;
-
-	private HotelCategory category;
-
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(foreignKey = @ForeignKey(name = "fk_category_hotel"))
+	private Category category;
+	@Column
+	@NotNull
 	private String url;
+	@Column
 	private String description;
 
-	public boolean isPersisted() {
-		return id != null;
-	}
-
-	@Override
-	public String toString() {
-		return name + " " + rating + "stars " + address;
-	}
-
-	@Override
-	public Hotel clone() throws CloneNotSupportedException {
-		return (Hotel) super.clone();
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		return super.equals(obj);
-	}
-
-	@Override
-	public int hashCode() {
-		return super.hashCode();
-	}
-
 	public Hotel() {
-	}
-
-	public Long getId() {
-		return id;
-	}
-
-	public void setId(Long id) {
-		this.id = id;
 	}
 
 	public String getName() {
@@ -72,13 +61,11 @@ public class Hotel implements Serializable, Cloneable {
 		this.address = address;
 	}
 
-	
-
-	public int getRating() {
+	public Integer getRating() {
 		return rating;
 	}
 
-	public void setRating(int rating) {
+	public void setRating(Integer rating) {
 		this.rating = rating;
 	}
 
@@ -90,11 +77,11 @@ public class Hotel implements Serializable, Cloneable {
 		this.operatesFrom = operatesFrom;
 	}
 
-	public HotelCategory getCategory() {
+	public Category getCategory() {
 		return category;
 	}
 
-	public void setCategory(HotelCategory category) {
+	public void setCategory(Category category) {
 		this.category = category;
 	}
 
@@ -114,22 +101,13 @@ public class Hotel implements Serializable, Cloneable {
 		this.description = description;
 	}
 
-	public Hotel(Long id, String name, String address, int rating, Long operatesFrom, HotelCategory category,
-			String url) {
-		super();
-		this.id = id;
-		this.name = name;
-		this.address = address;
-		this.rating = rating;
-		this.operatesFrom = operatesFrom;
-		this.category = category;
-		this.url = url;
+	public Long getOptlock() {
+		return optlock;
 	}
 
-	public Hotel(Long id, String name, String address, int rating, long operatesFrom, HotelCategory category,
-			String url, String description) {
+	public Hotel(String name, String address, Integer rating, Long operatesFrom, Category category, String url,
+			String description) {
 		super();
-		this.id = id;
 		this.name = name;
 		this.address = address;
 		this.rating = rating;
@@ -138,5 +116,7 @@ public class Hotel implements Serializable, Cloneable {
 		this.url = url;
 		this.description = description;
 	}
-
+	public boolean isPersisted(){
+		return getId()!=null;
+	}
 }
