@@ -68,7 +68,7 @@ public class HotelForm extends FormLayout {
 		addComponents(name, address, rating, url, operatesFrom, category, description, buttons);
 		refresh();
 		 
-		
+		category.setItemCaptionGenerator(Category::getName);
 		deleteBtn.addClickListener(e -> deleteHotel());
 		saveBtn.addClickListener(e -> saveHotel());
 		

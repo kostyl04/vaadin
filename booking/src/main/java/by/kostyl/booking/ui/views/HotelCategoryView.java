@@ -96,6 +96,7 @@ public class HotelCategoryView extends VerticalLayout implements View {
 	private HorizontalLayout createContent() {
 		categorySelect=new ListSelect<Category>();
 		updateSelect();
+		categorySelect.setItemCaptionGenerator(Category::getName);
 		this.categorySelect.setWidth("220px");
 		editCategoryBtn=new Button("Edit");
 		editCategoryBtn.setEnabled(false);

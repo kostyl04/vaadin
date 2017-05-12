@@ -29,10 +29,10 @@ public class Category extends AbstractEntity {
 	public Category() {
 	}
 
-	@Override
+	/*@Override
 	public String toString() {
 		return name;
-	}
+	}*/
 
 	
 

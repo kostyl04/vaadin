@@ -102,11 +102,13 @@ public class HotelView extends VerticalLayout implements View {
 	void init() {
 		final VerticalLayout layout = new VerticalLayout();
 		this.hotelForm=new HotelForm(this,hotelService);
-		hotelGrid.setColumns("id", "name", "category", "rating", "description", "address");
+		hotelGrid.setColumns("id", "name",  "rating", "description", "address");
 		Column<Hotel, String> htmlColumn = hotelGrid.addColumn(
 				hotel -> "<a href='" + hotel.getUrl() + "' target='_top'>" + hotel.getUrl() + "</a>",
 				new HtmlRenderer());
 		htmlColumn.setCaption("Link");
+		Column<Hotel, String> column= hotelGrid.addColumn(hotel -> hotel.getCategory().getName());
+		column.setCaption("Category");
 		updateHotels();
 		HorizontalLayout main = new HorizontalLayout(hotelGrid, hotelForm);
 		main.setSizeFull();
