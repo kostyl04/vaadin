@@ -1,5 +1,6 @@
 package by.kostyl.booking.dao;
 
+import java.util.Arrays;
 import java.util.List;
 
 import javax.persistence.Query;
@@ -18,6 +19,18 @@ public class HotelDao extends CrudDaoBean{
 		@SuppressWarnings("unchecked")
 		List <Hotel> result=query.getResultList();
 		return result;
+		
+	}
+
+	public void updateMultiple(String field, String value, long[] in) {
+		String ids=Arrays.toString(in);
+		ids=ids.replaceAll("\\[", "(");
+		ids=ids.replaceAll("\\]", ")");
+		String queryString="update Hotel set "+field+" ='"+value+"' where id in "+ids;
+		System.out.println(queryString);
+		Query query = currentSession()
+				.createQuery(queryString);
+		query.executeUpdate();
 		
 	}
 }

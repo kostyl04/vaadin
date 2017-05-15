@@ -53,7 +53,7 @@ public class HotelForm extends FormLayout {
 	private TextField url = new TextField("link to booking");
 
 	private DateField operatesFrom = new DateField("from");
-
+	
 	private NativeSelect<Category> category = new NativeSelect<>("category");
 	private Button saveBtn = new Button("Save");
 	private Button deleteBtn = new Button("Delete");
@@ -99,7 +99,9 @@ public class HotelForm extends FormLayout {
 				.withConverter(new OperatesFromConverter())
 				.withValidator(val -> val > 0, "Were u operating for negative days??")
 				.bind(Hotel::getOperatesFrom, Hotel::setOperatesFrom);
-		hotelBinder.forField(category).bind(Hotel::getCategory, Hotel::setCategory);
+		hotelBinder.forField(category)
+		.withValidator(val->checkForNull(val), "Please choose category")
+		.bind(Hotel::getCategory, Hotel::setCategory);
 		// tooltips for fields
 		rating.setDescription("Enter rating from 1 to 5");
 		name.setDescription("Enter name of ur hotel");
@@ -143,5 +145,7 @@ public class HotelForm extends FormLayout {
 	private void refresh(){
 		category.setItems(hotelService.getCategories());
 	}
-	
+	private boolean checkForNull(Category category){
+		return category.getId()!=null;
+	}
 }

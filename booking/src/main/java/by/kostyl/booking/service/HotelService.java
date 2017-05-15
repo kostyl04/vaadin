@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,6 +55,16 @@ public class HotelService {
 	}
 	public List<Hotel> filter(String name, String address) {
 		return  hotelDao.filter(name,address);
+		
+	}
+	public void bulkUpdate(String field, String value, Set<Hotel> selectedItems) {
+		long [] in=new long [selectedItems.size()];
+		int i=0;
+		for(Hotel h:selectedItems){
+			in[i]=h.getId();
+			i++;
+		}
+		hotelDao.updateMultiple(field,value,in);
 		
 	}
 	

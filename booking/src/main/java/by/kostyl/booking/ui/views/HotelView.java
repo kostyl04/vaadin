@@ -1,5 +1,10 @@
 package by.kostyl.booking.ui.views;
 
+import java.time.Duration;
+import java.time.LocalDate;
+import java.util.Arrays;
+import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -19,11 +24,17 @@ import com.vaadin.server.VaadinServlet;
 import com.vaadin.spring.annotation.SpringView;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CssLayout;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.Column;
+import com.vaadin.ui.Grid.SelectionMode;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Link;
+import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.PopupView;
+import com.vaadin.ui.PopupView.Content;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -54,14 +65,15 @@ public class HotelView extends VerticalLayout implements View {
 	@Autowired
 	private HotelService hotelService;
 	private Grid<Hotel> hotelGrid = new Grid<>(Hotel.class);
-
+	private Button editBtn = new Button("Edit");
+	private Button bulkUpdateBtn = new Button("BulkUpdate");
 	private TextField filterField = new TextField();
 	private HotelForm hotelForm;
 	private TextField filterByAddressField = new TextField();
 	private Button clearAddressFilterBtn = new Button(VaadinIcons.CLOSE_CIRCLE);
 	private Button clearBtn = new Button(VaadinIcons.CLOSE_CIRCLE);
 	private CssLayout filtering = buildFilteringLayout();
-
+	private PopupView popup;
 	/*
 	 * @Override protected void init(VaadinRequest vaadinRequest) {
 	 * 
@@ -78,8 +90,8 @@ public class HotelView extends VerticalLayout implements View {
 
 	}
 
-	private void filter(){
-		hotelGrid.setItems(hotelService.filter(filterField.getValue(),filterByAddressField.getValue()));
+	private void filter() {
+		hotelGrid.setItems(hotelService.filter(filterField.getValue(), filterByAddressField.getValue()));
 	}
 
 	private CssLayout buildFilteringLayout() {
@@ -101,13 +113,14 @@ public class HotelView extends VerticalLayout implements View {
 	@PostConstruct
 	void init() {
 		final VerticalLayout layout = new VerticalLayout();
-		this.hotelForm=new HotelForm(this,hotelService);
-		hotelGrid.setColumns("id", "name",  "rating", "description", "address");
+		this.hotelForm = new HotelForm(this, hotelService);
+		hotelGrid.setSelectionMode(SelectionMode.MULTI);
+		hotelGrid.setColumns("id", "name", "rating", "description", "address", "operatesFrom");
 		Column<Hotel, String> htmlColumn = hotelGrid.addColumn(
 				hotel -> "<a href='" + hotel.getUrl() + "' target='_top'>" + hotel.getUrl() + "</a>",
 				new HtmlRenderer());
 		htmlColumn.setCaption("Link");
-		Column<Hotel, String> column= hotelGrid.addColumn(hotel -> hotel.getCategory().getName());
+		Column<Hotel, String> column = hotelGrid.addColumn(hotel -> hotel.getCategory().getName());
 		column.setCaption("Category");
 		updateHotels();
 		HorizontalLayout main = new HorizontalLayout(hotelGrid, hotelForm);
@@ -116,22 +129,120 @@ public class HotelView extends VerticalLayout implements View {
 		main.setExpandRatio(hotelGrid, 1);
 
 		hotelForm.setVisible(false);
-		hotelGrid.asSingleSelect().addValueChangeListener(e -> {
-			if (e.getValue() == null) {
+		editBtn.addClickListener(e -> {
+			Set<Hotel> set = hotelGrid.getSelectedItems();
+			if (!set.isEmpty()) {
+				hotelForm.setHotel(set.iterator().next());
+			}
+		});
+
+		hotelGrid.asMultiSelect().addValueChangeListener(e -> {
+			
+			if (hotelGrid.getSelectedItems().size() > 1) {
+				bulkUpdateBtn.setEnabled(true);
 				hotelForm.setVisible(false);
-			} else
-				hotelForm.setHotel(e.getValue());
+				editBtn.setEnabled(false);
+			} else if (hotelGrid.getSelectedItems().size() == 1) {
+				editBtn.setEnabled(true);
+				bulkUpdateBtn.setEnabled(false);
+				hotelForm.setVisible(false);
+			} else {
+				bulkUpdateBtn.setEnabled(false);
+				hotelForm.setVisible(false);
+				editBtn.setEnabled(false);
+			}
+
 		});
 		Button addNewHotelBtn = new Button("New Hotel");
 		addNewHotelBtn.addClickListener(e -> {
-			hotelGrid.asSingleSelect().clear();
+			hotelGrid.asMultiSelect().clear();
 			hotelForm.setHotel(new Hotel("", "", 1, 123L, new Category(), "", ""));
 
 		});
-		HorizontalLayout toolbar = new HorizontalLayout(filtering, addNewHotelBtn);
-
+		HorizontalLayout toolbar = new HorizontalLayout(filtering, addNewHotelBtn, editBtn, bulkUpdateBtn);
+		bulkUpdateBtn.setEnabled(false);
+		editBtn.setEnabled(false);
+		bulkUpdateBtn.addClickListener(e -> {
+			this.popup.setPopupVisible(true);
+		});
 		layout.addComponents(toolbar, main);
 		this.addComponents(header, layout);
+		buildPopup();
+		toolbar.addComponent(this.popup);
+
+	}
+
+	private void buildPopup() {
+
+		NativeSelect<String> selectField = new NativeSelect();
+		selectField
+				.setItems(Arrays.asList("name", "address", "url", "description", "category", "rating", "operatesFrom"));
+		selectField.setSelectedItem("name");
+
+		TextField change = new TextField();
+		NativeSelect<Category> categorySelect = new NativeSelect<>(null, hotelService.getCategories());
+		NativeSelect<Integer> ratingSelect = new NativeSelect<>(null, Arrays.asList(1, 2, 3, 4, 5));
+		categorySelect.setVisible(false);
+		categorySelect.addValueChangeListener(e -> {
+			if (e.getValue() != null)
+				change.setValue(String.valueOf(e.getValue().getId()));
+
+		});
+		DateField operatesFrom = new DateField("from");
+		operatesFrom.setVisible(false);
+		operatesFrom.setRangeEnd(LocalDate.now());
+		operatesFrom.addValueChangeListener(e -> {
+			if (e.getValue() != null)
+				change.setValue(String
+						.valueOf(Duration.between(e.getValue().atTime(0, 0), LocalDate.now().atTime(0, 0)).toDays()));
+
+		});
+		ratingSelect.setVisible(false);
+		ratingSelect.addValueChangeListener(e -> {
+			if (e.getValue() != null)
+				change.setValue(String.valueOf(e.getValue()));
+
+		});
+		categorySelect.setItemCaptionGenerator(Category::getName);
+		Button update = new Button("update");
+		Label label = new Label("Update Hotels");
+		VerticalLayout lay = new VerticalLayout(label, selectField, change, categorySelect, ratingSelect, operatesFrom,
+				update);
+		lay.setWidth("250px");
+		lay.setHeight("400px");
+		this.popup = new PopupView(null, lay);
+		update.addClickListener(e -> {
+			if (!selectField.isEmpty() && !change.isEmpty()) {
+				String field = selectField.getValue();
+				if (field.equals("category")) {
+					field = "category_id";
+				}
+				if (field.equals("operatesFrom")) {
+					field = "OPERATES_FROM";
+				}
+				hotelService.bulkUpdate(field, change.getValue(), this.hotelGrid.getSelectedItems());
+				this.popup.setPopupVisible(false);
+				this.updateHotels();
+			}
+		});
+		selectField.addValueChangeListener(e -> {
+			change.clear();
+			change.setVisible(false);
+			categorySelect.setVisible(false);
+			ratingSelect.setVisible(false);
+			operatesFrom.setVisible(false);
+			if (e.getValue() != null) {
+				if (e.getValue().equals("category")) {
+					categorySelect.setVisible(true);
+				} else if (e.getValue().equals("rating")) {
+					ratingSelect.setVisible(true);
+				} else if (e.getValue().equals("operatesFrom")) {
+					operatesFrom.setVisible(true);
+				} else {
+					change.setVisible(true);
+				}
+			}
+		});
 	}
 
 	@Override
