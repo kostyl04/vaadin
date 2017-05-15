@@ -27,7 +27,6 @@ public class HotelDao extends CrudDaoBean{
 		ids=ids.replaceAll("\\[", "(");
 		ids=ids.replaceAll("\\]", ")");
 		String queryString="update Hotel set "+field+" ='"+value+"' where id in "+ids;
-		System.out.println(queryString);
 		Query query = currentSession()
 				.createQuery(queryString);
 		query.executeUpdate();
