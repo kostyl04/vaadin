@@ -44,16 +44,13 @@ public class App extends UI{
     public static class MyConfiguration {
     	
     }
-    @Autowired 
-	private ApplicationContext applicationContext;
     @Autowired
     SpringViewProvider viewProvider;
 	@Override
 	protected void init(VaadinRequest request) {
 		this.navigator = new Navigator(this, this);
 		navigator.addProvider(viewProvider);
-		String [] beans=applicationContext.getBeanDefinitionNames();
-		for(String b:beans)System.out.println(b);
+		
 	    
 		
 	}
