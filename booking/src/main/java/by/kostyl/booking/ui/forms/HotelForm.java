@@ -23,7 +23,6 @@ import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.declarative.Design;
 
-
 import by.kostyl.booking.converters.OperatesFromConverter;
 import by.kostyl.booking.entity.Category;
 import by.kostyl.booking.entity.Hotel;
@@ -48,30 +47,30 @@ public class HotelForm extends FormLayout {
 	private TextField name = new TextField("name");
 	private TextArea description = new TextArea("description");
 	private TextField address = new TextField("adress");
-
+	private PaymentServiceField paymentType = new PaymentServiceField();
 	private TextField rating = new TextField("rating");
 	private TextField url = new TextField("link to booking");
 
 	private DateField operatesFrom = new DateField("from");
-	
+
 	private NativeSelect<Category> category = new NativeSelect<>("category");
 	private Button saveBtn = new Button("Save");
 	private Button deleteBtn = new Button("Delete");
 	private Binder<Hotel> hotelBinder = new Binder<Hotel>(Hotel.class);
 
-	public HotelForm(HotelView ui,HotelService service) {
-		this.hotelService=service;
+	public HotelForm(HotelView ui, HotelService service) {
+		this.hotelService = service;
 		this.ui = ui;
 		setSizeUndefined();
 		bindForm();
 		HorizontalLayout buttons = new HorizontalLayout(saveBtn, deleteBtn);
-		addComponents(name, address, rating, url, operatesFrom, category, description, buttons);
+		addComponents(name, address, rating, url, operatesFrom, paymentType, category, description, buttons);
 		refresh();
-		 
+
 		category.setItemCaptionGenerator(Category::getName);
 		deleteBtn.addClickListener(e -> deleteHotel());
 		saveBtn.addClickListener(e -> saveHotel());
-		
+
 	}
 
 	public Hotel getHotel() {
@@ -99,9 +98,17 @@ public class HotelForm extends FormLayout {
 				.withConverter(new OperatesFromConverter())
 				.withValidator(val -> val > 0, "Were u operating for negative days??")
 				.bind(Hotel::getOperatesFrom, Hotel::setOperatesFrom);
-		hotelBinder.forField(category)
-		.withValidator(val->checkForNull(val), "Please choose category")
-		.bind(Hotel::getCategory, Hotel::setCategory);
+		hotelBinder.forField(category).withValidator(val -> checkForNull(val), "Please choose category")
+				.bind(Hotel::getCategory, Hotel::setCategory);
+	
+		hotelBinder.forField(paymentType).withValidator(val -> {
+			if (val.getGuaranty_fee() >= 0 && val.getGuaranty_fee() <= 100&&(val.getCashType()!=null||val.getCreditCardType()!=null))
+				return true;
+			return false;
+		}, "Fill correct percent, please").bind(Hotel::getPaymentService, Hotel::setPaymentService);
+		paymentType.addValueChangeListener(val->{
+			Notification.show(val.getOldValue()+" set to "+ val.getValue());
+		});
 		// tooltips for fields
 		rating.setDescription("Enter rating from 1 to 5");
 		name.setDescription("Enter name of ur hotel");
@@ -118,9 +125,10 @@ public class HotelForm extends FormLayout {
 		this.hotel = hotel;
 		hotelBinder.setBean(hotel);
 		deleteBtn.setVisible(hotel.isPersisted());
+		paymentType.setValue(hotel.getPaymentService());
 		setVisible(true);
 		name.selectAll();
-		
+
 	}
 
 	public void deleteHotel() {
@@ -130,22 +138,23 @@ public class HotelForm extends FormLayout {
 
 	}
 
-	public void saveHotel() {	
+	public void saveHotel() {
 		if (hotelBinder.isValid()) {
 			hotelService.saveHotel(this.hotel);
 			this.ui.updateHotels();
 			setVisible(false);
-		} else{
+		} else {
 			Notification.show("Please take a look to fields tooltips and fill all fields correctly!!");
 			hotelBinder.validate();
 		}
-			
 
 	}
-	private void refresh(){
+
+	private void refresh() {
 		category.setItems(hotelService.getCategories());
 	}
-	private boolean checkForNull(Category category){
-		return category.getId()!=null;
+
+	private boolean checkForNull(Category category) {
+		return category.getId() != null;
 	}
 }

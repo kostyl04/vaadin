@@ -52,4 +52,11 @@
             referencedColumnNames="id"
             referencedTableName="CATEGORY"/>
 	</changeSet>
+	<changeSet id="SERVICES" author="kostyl">
+		<addColumn tableName="HOTEL">
+			<column name="GUARANTY_FEE" type="INT NOT NULL DEFAULT 0"/>
+			<column name="CREDITCARDTYPE" type="BIT(1) NOT NULL DEFAULT 0"/>
+			<column name="CASHTYPE" type="BIT(1)  NOT NULL DEFAULT 0"/>
+		</addColumn>
+	</changeSet>
 </databaseChangeLog>

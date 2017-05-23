@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDate;
 
 import javax.persistence.Column;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.ForeignKey;
@@ -41,7 +42,8 @@ public class Hotel extends AbstractEntity {
 	private String url;
 	@Column
 	private String description;
-
+	@Embedded
+	private PaymentService paymentService;
 	public Hotel() {
 	}
 
@@ -106,7 +108,7 @@ public class Hotel extends AbstractEntity {
 	}
 
 	public Hotel(String name, String address, Integer rating, Long operatesFrom, Category category, String url,
-			String description) {
+			String description,PaymentService paymentService) {
 		super();
 		this.name = name;
 		this.address = address;
@@ -115,8 +117,18 @@ public class Hotel extends AbstractEntity {
 		this.category = category;
 		this.url = url;
 		this.description = description;
+		this.paymentService=paymentService;
 	}
 	public boolean isPersisted(){
 		return getId()!=null;
 	}
+
+	public PaymentService getPaymentService() {
+		return paymentService;
+	}
+
+	public void setPaymentService(PaymentService paymentService) {
+		this.paymentService = paymentService;
+	}
+	
 }

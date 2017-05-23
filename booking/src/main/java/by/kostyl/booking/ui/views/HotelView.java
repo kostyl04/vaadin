@@ -43,6 +43,7 @@ import com.vaadin.ui.themes.ValoTheme;
 
 import by.kostyl.booking.entity.Category;
 import by.kostyl.booking.entity.Hotel;
+import by.kostyl.booking.entity.PaymentService;
 import by.kostyl.booking.service.HotelService;
 import by.kostyl.booking.ui.forms.HotelForm;
 import by.kostyl.booking.ui.views.imports.Header;
@@ -156,7 +157,7 @@ public class HotelView extends VerticalLayout implements View {
 		Button addNewHotelBtn = new Button("New Hotel");
 		addNewHotelBtn.addClickListener(e -> {
 			hotelGrid.asMultiSelect().clear();
-			hotelForm.setHotel(new Hotel("", "", 1, 123L, new Category(), "", ""));
+			hotelForm.setHotel(new Hotel("", "", 1, 123L, new Category(), "", "",new PaymentService(0, false, true)));
 
 		});
 		HorizontalLayout toolbar = new HorizontalLayout(filtering, addNewHotelBtn, editBtn, bulkUpdateBtn);
